@@ -8,12 +8,12 @@ exit /b
 #PS-START
 # One-click installer for Elden Ring Seamless Co-op (https://github.com/tragiik1/one-click-install-ersc)
 # Downloads the latest official release from https://github.com/yuiamoroll/EldenRingSeamlessCoopRelease
-# and installs it with the shared group settings below. Never deletes anything.
+# and installs it with the preset settings below. Never deletes anything.
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# The group's settings. The co-op password is asked for during setup and put in place of __PASSWORD__.
+# Preset settings. The session password is entered during setup and replaces __PASSWORD__.
 $Settings = @'
 [GAMEPLAY]
 
@@ -84,7 +84,7 @@ function Fail($msg) {
     Say '  SETUP DID NOT FINISH' 'Red'
     Say "  $msg" 'Yellow'
     Write-Host ''
-    Say '  Send Noah a screenshot of this window.' 'Gray'
+    Say '  Your save files were not touched.' 'Gray'
 }
 
 function Test-GameDir($dir) {
@@ -141,7 +141,7 @@ try {
     # 1. Game must be closed
     Say '  [1/6] Checking Elden Ring is closed...'
     if (Get-Process -Name 'eldenring', 'start_protected_game', 'ersc_launcher' -ErrorAction SilentlyContinue) {
-        Fail 'Elden Ring is running. Close the game completely, then run this file again.'; return
+        Fail 'Elden Ring is running. Close the game and run setup again.'; return
     }
 
     # 2. Find the game
@@ -166,18 +166,18 @@ try {
     $iniPath = Join-Path $coopDir 'ersc_settings.ini'
 
     # 3. Co-op password
-    Say '  [3/6] Co-op password'
+    Say '  [3/6] Session password'
     $current = Get-CurrentPassword $iniPath
     $password = $null
     $tries = 0
     while (-not $password) {
         if (++$tries -gt 5) { Fail 'No password was entered.'; return }
-        if ($current) { $typed = Read-Host '        Type the co-op password Noah gave you (or just press Enter to keep your current one)' }
-        else { $typed = Read-Host '        Type the co-op password Noah gave you, then press Enter' }
+        if ($current) { $typed = Read-Host '        Enter the session password (leave blank to keep the current one)' }
+        else { $typed = Read-Host '        Enter the session password' }
         $typed = "$typed".Trim()
         if ($typed) { $password = $typed }
         elseif ($current) { $password = $current }
-        else { Say '        The password cannot be empty.' 'Yellow' }
+        else { Say '        A password is required.' 'Yellow' }
     }
 
     # 4. Download the latest official release
@@ -209,7 +209,7 @@ try {
     $srcCoop = Join-Path $srcRoot 'SeamlessCoop'
 
     # 5. Install: back up old settings, copy release files over (adds/overwrites only), write settings
-    Say '  [5/6] Installing the mod and the group settings...'
+    Say '  [5/6] Installing mod files and settings...'
     if (Test-Path -LiteralPath $iniPath) {
         $backup = Join-Path $coopDir ('ersc_settings.backup-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.ini')
         Copy-Item -LiteralPath $iniPath -Destination $backup
@@ -248,10 +248,10 @@ try {
     } catch { Fail "The mod is installed, but the desktop shortcut could not be made. Start the game with ersc_launcher.exe in: $game"; return }
 
     Write-Host ''
-    Say "  ALL DONE! Seamless Co-op $($release.tag_name) is installed with the group settings." 'Green'
+    Say "  Setup complete. Seamless Co-op $($release.tag_name) is installed." 'Green'
     Write-Host ''
-    Say '  To play: open Steam, then double-click "Elden Ring Co-op" on your desktop.' 'White'
-    Say '  (Steam''s Play button starts the normal game without co-op.)' 'Gray'
+    Say '  To play, open Steam and launch "Elden Ring Co-op" from your desktop.' 'White'
+    Say '  Launching from Steam starts the game without Seamless Co-op.' 'Gray'
 }
 catch {
     Fail "Unexpected problem: $($_.Exception.Message)"
