@@ -40,7 +40,7 @@ Save files in `%APPDATA%\EldenRing` are never modified.
 | Setting | Value |
 |---|---|
 | Invaders | Off |
-| Death debuffs | On |
+| Death debuffs (Rot Essence) | Off |
 | Spirit summons | On |
 | Enemy health per additional player | +35% |
 | Enemy damage per additional player | +0% |

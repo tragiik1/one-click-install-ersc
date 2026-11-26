@@ -21,7 +21,7 @@ $Settings = @'
 allow_invaders = 0
 
 ; Debuffs (Rot Essence) will be acquired when you die, and will only be cured when you sit at a bonfire.  0=FALSE  1=TRUE
-death_debuffs = 1
+death_debuffs = 0
 
 ; Spirit summons can aid you in multiplayer.  0=FALSE  1=TRUE
 allow_summons = 1
